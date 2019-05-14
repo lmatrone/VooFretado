@@ -1,0 +1,89 @@
+pragma solidity 0.5.8;
+
+contract Fretamento {
+   
+    address payable contaAgenciaA;
+    address payable contaAgenciaB;
+    address payable contaAgenciaC;
+    address payable contaPassageiro;
+    string agencias;
+    string agenciaA;
+    string agenciaB;
+    string agenciaC;
+    uint quantBilhetesDesejados;
+    address payable operadora;
+    uint bilhetesVendidosA;
+    uint bilhetesVendidosB;
+    uint bilhetesVendidosC;
+    uint precoPassagem;
+    uint precoFretamento;
+    uint assento;
+    string nomePassageiro;
+    uint passagensDisponiveis = 180;
+    event Mensagem(string texto, address emitente, uint256 horario);
+   
+    enum Status {AeronaveEmSolo, AguardandoEmbarque, AterrisagemConcluida, TransacaoFinalizada}
+    
+    Status statusAtual;
+   
+    modifier noStatus(Status statusDesejado) { require(statusAtual == statusDesejado); _;}
+       
+    struct agencia {string nome; uint passagensVendidas;}
+   
+    function vendaAgenciaA() noStatus(Status.AeronaveEmSolo) public payable {
+        ((passagensDisponiveis/3>0 && passagensDisponiveis<60));
+        statusAtual = Status.AguardandoEmbarque;
+        contaAgenciaA.transfer(precoPassagem*quantBilhetesDesejados);
+        msg.sender == contaPassageiro;
+        emit Mensagem("Bilhete Vendido pela Agencia A", msg.sender, now);
+    }
+    function vendaAgenciaB() noStatus(Status.AeronaveEmSolo) public payable {
+        ((passagensDisponiveis/3>0 && passagensDisponiveis<60));
+        statusAtual = Status.AguardandoEmbarque;
+        contaAgenciaB.transfer(precoPassagem*quantBilhetesDesejados);
+        msg.sender == contaPassageiro;
+        emit Mensagem("Bilhete Vendido pela Agencia B", msg.sender, now);
+    }
+    function vendaAgenciaC() noStatus(Status.AeronaveEmSolo) public payable {
+        ((passagensDisponiveis/3>0 && passagensDisponiveis<60));
+        statusAtual = Status.AguardandoEmbarque;
+        contaAgenciaC.transfer(precoPassagem*quantBilhetesDesejados);
+        msg.sender == contaPassageiro;
+        emit Mensagem("Bilhete Vendido pela Agencia C", msg.sender, now);
+    }
+    struct passageiro {
+        
+        string nome;
+        uint assento;
+        string agenciaEscolhida;
+    }
+    string[] numPassageiros;
+    string[] numAssentos;
+    
+    function alocarPassageiro(string memory _nome) public {
+        numPassageiros.push(_nome);
+    }   
+    function assentoPassageiro(uint _num) public returns(string memory) {
+        return numPassageiros[_num];
+    }
+    function pagFretamentoA() noStatus(Status.AterrisagemConcluida) public payable {
+        statusAtual = Status.TransacaoFinalizada;
+        require(msg.sender == contaAgenciaA);
+        operadora.transfer(precoFretamento/3);
+        emit Mensagem("Bilhete Vendido pela Agencia C", msg.sender, now);
+    }
+    function pagFretamentoB() noStatus(Status.AterrisagemConcluida) public payable {
+        statusAtual = Status.TransacaoFinalizada;
+        require(msg.sender == contaAgenciaB);
+        operadora.transfer(precoFretamento/3);
+    }
+    function pagFretamentoC() noStatus(Status.AterrisagemConcluida) public payable {
+        statusAtual = Status.TransacaoFinalizada;
+        require(msg.sender == contaAgenciaC);
+        operadora.transfer(precoFretamento/3);
+    }
+    function TotalPassagensVendidas() public view returns(uint) {
+        return bilhetesVendidosA + bilhetesVendidosB + bilhetesVendidosC;
+    }
+  
+}
